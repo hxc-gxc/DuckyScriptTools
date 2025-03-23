@@ -1,4 +1,3 @@
-d/Downloads/index.html
 <!DOCTYPE html>
 <html>
 <head>
@@ -165,10 +164,27 @@ d/Downloads/index.html
       align-items: center;
     }
 
+    #openButton {
+      width: 100%;
+      height: 60px;
+      padding: 12px;
+      border: none;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      background-color: #3498db; /* Blue Open button */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
     /* Action buttons container - now side by side */
     .action-buttons {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
       margin-bottom: 10px;
     }
@@ -266,6 +282,7 @@ d/Downloads/index.html
     <b>Output:</b>
     <textarea id="output" rows="4" cols="50" placeholder="Your Ducky script will appear here. You can edit this manually before saving."></textarea>
     <div class="action-buttons">
+      <button id="openButton"><i class="fa-solid fa-folder-open btn-icon"></i>Open</button>
       <button id="saveButton"><i class="fa-solid fa-floppy-disk btn-icon"></i>Save</button>
       <button id="clearButton"><i class="fa-solid fa-trash-can btn-icon"></i>Clear</button>
     </div>
@@ -442,6 +459,44 @@ d/Downloads/index.html
     document.getElementById('createRemarkButton').addEventListener('click', createRemark);
     document.getElementById('saveButton').addEventListener('click', saveOutput);
     document.getElementById('clearButton').addEventListener('click', clearOutput);
+    document.getElementById('openButton').addEventListener('click', openFile);
+    
+    // Add file opening function
+    function openFile() {
+      // Create a hidden file input element
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.txt';
+      
+      // Handle file selection
+      fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const contents = e.target.result;
+          document.getElementById('output').value = contents;
+          
+          // Provide feedback
+          alert(`File "${file.name}" loaded successfully`);
+          
+          // Vibrate for feedback on mobile
+          if (navigator.vibrate) {
+            navigator.vibrate([50, 30, 50]);
+          }
+        };
+        
+        reader.onerror = function() {
+          alert('Error reading file');
+        };
+        
+        reader.readAsText(file);
+      });
+      
+      // Trigger the file dialog
+      fileInput.click();
+    }
     
     // Add the clear button function
     function clearOutput() {
