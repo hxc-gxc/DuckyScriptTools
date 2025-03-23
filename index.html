@@ -1,0 +1,671 @@
+d/Downloads/index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DuckyScript Maker</title>
+  <meta name="description" content="Create a DuckyScript for your Flipper Zero using a smartphone when you don't have access to a laptop or computer">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- PWA metadata -->
+  <meta name="theme-color" content="#FFB866">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ducky Script">
+  <link rel="manifest" href="manifest.json">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background-color: #f8f8f8;
+      margin: 0;
+      padding-top: 170px; /* Reduced space for fixed header */
+      touch-action: manipulation;
+    }
+
+    b {
+      font-size: 18px;
+      display: block;
+      margin-bottom: 10px;
+      padding: 8px;
+      background-color: #eee;
+      border-radius: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+      font-size: 18px; /* Larger font size */
+      margin-bottom: 10px;
+    }
+
+    .container {
+      margin-bottom: 25px;
+      background-color: white;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Big button grid - only 2 buttons per row */
+    .other {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    /* For function buttons, three per row */
+    .function .other {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Larger buttons */
+    .other button {
+      width: 100%;
+      height: 60px; /* Much taller buttons */
+      font-size: 16px; /* Larger text */
+      border: none;
+      background-color: #FFB866;
+      color: black;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .other button:active {
+      background-color: #FF9933;
+      transform: translateY(2px);
+    }
+    
+    /* Style for icons in buttons */
+    .btn-icon {
+      margin-right: 8px;
+      font-size: 20px;
+    }
+
+    /* Inputs style */
+    .other input[type="number"],
+    .other input[type="text"] {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 18px;
+      height: 60px;
+    }
+
+    /* Action buttons */
+    #createStringButton,
+    #createRemarkButton {
+      width: 100%;
+      height: 60px;
+      padding: 12px;
+      border: none;
+      color: black;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      background-color: #FFB866;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Specific button colors */
+    #saveButton {
+      width: 100%;
+      height: 60px;
+      padding: 12px;
+      border: none;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      background-color: #4CAF50; /* Green Save button */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #clearButton {
+      width: 100%;
+      height: 60px;
+      padding: 12px;
+      border: none;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      background-color: #ff6b6b; /* Red Clear button */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Action buttons container - now side by side */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    #output {
+      width: 100%;
+      height: 100px; /* Shorter output area to save space */
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+      font-size: 18px;
+    }
+
+    .fixed-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      padding: 10px 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
+
+    /* Repository link */
+    .repo-link {
+      text-align: center;
+      margin: 20px 0 40px 0;
+      padding: 20px;
+    }
+    
+    .repo-link a {
+      color: #0366d6;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+      padding: 15px;
+      display: inline-block;
+    }
+
+    /* Scroll to top button */
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #FFB866;
+      color: black;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      border: none;
+      z-index: 999;
+    }
+
+    /* Fix for modifier buttons */
+    .modifier-highlight {
+      background-color: #ffd699 !important;
+      box-shadow: inset 0 0 0 2px #ff8c00 !important;
+    }
+
+    /* Icons for arrow keys */
+    .arrow {
+      font-size: 24px;
+    }
+
+    /* Bottom padding to ensure scrolling to the end */
+    .bottom-padding {
+      height: 80px;
+    }
+    
+    /* Offline notification */
+    #offline-notification {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #ff6b6b;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      font-weight: bold;
+      display: none;
+      z-index: 10000;
+    }
+  </style>
+</head>
+<body>
+  <div class="fixed-header">
+    <b>Output:</b>
+    <textarea id="output" rows="4" cols="50" placeholder="Your Ducky script will appear here. You can edit this manually before saving."></textarea>
+    <div class="action-buttons">
+      <button id="saveButton"><i class="fa-solid fa-floppy-disk btn-icon"></i>Save</button>
+      <button id="clearButton"><i class="fa-solid fa-trash-can btn-icon"></i>Clear</button>
+    </div>
+  </div>
+
+  <div class="container function">
+    <b>Function Keys:</b>
+    <div class="other">
+      <button onclick="appendToOutput('F1')">F1</button>
+      <button onclick="appendToOutput('F2')">F2</button>
+      <button onclick="appendToOutput('F3')">F3</button>
+      <button onclick="appendToOutput('F4')">F4</button>
+      <button onclick="appendToOutput('F5')">F5</button>
+      <button onclick="appendToOutput('F6')">F6</button>
+      <button onclick="appendToOutput('F7')">F7</button>
+      <button onclick="appendToOutput('F8')">F8</button>
+      <button onclick="appendToOutput('F9')">F9</button>
+      <button onclick="appendToOutput('F10')">F10</button>
+      <button onclick="appendToOutput('F11')">F11</button>
+      <button onclick="appendToOutput('F12')">F12</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>String Input:</b>
+    <textarea id="input" rows="4" cols="50" placeholder="Type your text here."></textarea>
+    <div class="action-buttons">
+      <button id="createStringButton"><i class="fa-solid fa-keyboard btn-icon"></i>Write String</button>
+      <button id="createRemarkButton"><i class="fa-solid fa-comment btn-icon"></i>Write Remark</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>Delay Commands:</b>
+    <div class="other">
+      <input id="delayInput" type="number" value="1000" min="0">
+      <button onclick="appendToOutput('DELAY ' + document.getElementById('delayInput').value)"><i class="fa-regular fa-clock btn-icon"></i>DELAY</button>
+    </div>
+    <div class="other">
+      <input id="defaultDelayInput" type="number" value="1000" min="0">
+      <button onclick="appendToOutput('DEFAULT_DELAY ' + document.getElementById('defaultDelayInput').value)"><i class="fa-solid fa-stopwatch btn-icon"></i>DEFAULT_DELAY</button>
+    </div>
+    <div class="other">
+      <input id="typSpeedInput" type="number" value="0" min="0">
+      <button onclick="appendToOutput('TYPSPEED ' + document.getElementById('typSpeedInput').value)"><i class="fa-solid fa-keyboard btn-icon"></i>TYPSPEED</button>
+    </div>
+    <div class="other">
+      <button onclick="appendToOutput('WAIT_FOR_BUTTON_PRESS')"><i class="fa-regular fa-hand-pointer btn-icon"></i>WAIT FOR BUTTON</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>Modifiers:</b>
+    <div class="other">
+      <button id="ctrlBtn" onclick="addModifier('CTRL')"><i class="fa-solid fa-c btn-icon"></i>CTRL</button>
+      <button id="shiftBtn" onclick="addModifier('SHIFT')"><i class="fa-solid fa-up-long btn-icon"></i>SHIFT</button>
+      <button id="altBtn" onclick="addModifier('ALT')"><i class="fa-solid fa-a btn-icon"></i>ALT</button>
+      <button id="guiBtn" onclick="addModifier('GUI')"><i class="fa-brands fa-windows btn-icon"></i>GUI</button>
+      <button id="altgrBtn" onclick="addModifier('ALTGR')"><i class="fa-solid fa-language btn-icon"></i>ALTGR</button>
+      <button id="windowsBtn" onclick="addModifier('WINDOWS')"><i class="fa-brands fa-windows btn-icon"></i>WINDOWS</button>
+      <button id="commandBtn" onclick="addModifier('COMMAND')"><i class="fa-brands fa-apple btn-icon"></i>COMMAND</button>
+    </div>
+    <div class="other">
+      <input id="charInput" type="text" maxlength="1" placeholder="Modified key">
+      <button onclick="insertChar()"><i class="fa-solid fa-plus btn-icon"></i>Add Key</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>Common Combos:</b>
+    <div class="other">
+      <button onclick="appendToOutput('CTRL-ALT')"><i class="fa-solid fa-link btn-icon"></i>CTRL+ALT</button>
+      <button onclick="appendToOutput('CTRL-SHIFT')"><i class="fa-solid fa-link btn-icon"></i>CTRL+SHIFT</button>
+      <button onclick="appendToOutput('ALT-SHIFT')"><i class="fa-solid fa-link btn-icon"></i>ALT+SHIFT</button>
+      <button onclick="appendToOutput('ALT-GUI')"><i class="fa-solid fa-link btn-icon"></i>ALT+GUI</button>
+      <button onclick="appendToOutput('GUI-SHIFT')"><i class="fa-solid fa-link btn-icon"></i>GUI+SHIFT</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>Arrow Keys:</b>
+    <div class="other">
+      <button onclick="appendToOutput('UPARROW')"><span class="arrow">↑</span></button>
+      <button onclick="appendToOutput('DOWNARROW')"><span class="arrow">↓</span></button>
+      <button onclick="appendToOutput('LEFTARROW')"><span class="arrow">←</span></button>
+      <button onclick="appendToOutput('RIGHTARROW')"><span class="arrow">→</span></button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>Common Control Keys:</b>
+    <div class="other">
+      <button onclick="appendToOutput('ENTER')"><i class="fa-solid fa-arrow-turn-down btn-icon"></i>ENTER</button>
+      <button onclick="appendToOutput('ESCAPE')"><i class="fa-solid fa-arrow-right-from-bracket btn-icon"></i>ESC</button>
+      <button onclick="appendToOutput('SPACE')"><i class="fa-solid fa-grip btn-icon"></i>SPACE</button>
+      <button onclick="appendToOutput('TAB')"><i class="fa-solid fa-arrow-right-to-bracket btn-icon"></i>TAB</button>
+      <button onclick="appendToOutput('BACKSPACE')"><i class="fa-solid fa-delete-left btn-icon"></i>BACKSPACE</button>
+      <button onclick="appendToOutput('DELETE')"><i class="fa-solid fa-delete-right btn-icon"></i>DELETE</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>Navigation Keys:</b>
+    <div class="other">
+      <button onclick="appendToOutput('HOME')"><i class="fa-solid fa-angles-left btn-icon"></i>HOME</button>
+      <button onclick="appendToOutput('END')"><i class="fa-solid fa-angles-right btn-icon"></i>END</button>
+      <button onclick="appendToOutput('PAGEUP')"><i class="fa-solid fa-angles-up btn-icon"></i>PAGE UP</button>
+      <button onclick="appendToOutput('PAGEDOWN')"><i class="fa-solid fa-angles-down btn-icon"></i>PAGE DOWN</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>Other Control Keys:</b>
+    <div class="other">
+      <button onclick="appendToOutput('CAPSLOCK')"><i class="fa-solid fa-font btn-icon"></i>CAPS LOCK</button>
+      <button onclick="appendToOutput('PRINTSCREEN')"><i class="fa-solid fa-camera btn-icon"></i>PRINT SCR</button>
+      <button onclick="appendToOutput('INSERT')"><i class="fa-solid fa-i-cursor btn-icon"></i>INSERT</button>
+      <button onclick="appendToOutput('MENU')"><i class="fa-solid fa-bars btn-icon"></i>MENU</button>
+      <button onclick="appendToOutput('PAUSE')"><i class="fa-solid fa-pause btn-icon"></i>PAUSE</button>
+      <button onclick="appendToOutput('BREAK')"><i class="fa-solid fa-stop btn-icon"></i>BREAK</button>
+      <button onclick="appendToOutput('NUMLOCK')"><i class="fa-solid fa-calculator btn-icon"></i>NUM LOCK</button>
+      <button onclick="appendToOutput('SCROLLOCK')"><i class="fa-solid fa-scroll btn-icon"></i>SCROLL LOCK</button>
+      <button onclick="appendToOutput('APP')"><i class="fa-solid fa-grid-2 btn-icon"></i>APP</button>
+      <button onclick="appendToOutput('SYSRQ')"><i class="fa-solid fa-print btn-icon"></i>SYSRQ</button>
+      <button onclick="appendToOutput('PRESS')"><i class="fa-solid fa-hand-point-down btn-icon"></i>PRESS</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <b>LEDs:</b>
+    <div class="other">
+      <button onclick="appendToOutput('LED ON')"><i class="fa-solid fa-lightbulb btn-icon"></i>LED ON</button>
+      <button onclick="appendToOutput('LED OFF')"><i class="fa-regular fa-lightbulb btn-icon"></i>LED OFF</button>
+    </div>
+  </div>
+
+  <div class="repo-link">
+    <a href="https://brutal-shop.com" target="_blank"><i class="fa-brands fa-github"></i> BRUTAL</a>
+  </div>
+
+  <div class="bottom-padding"></div>
+  <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+  <div id="offline-notification">You are offline. Some features may be limited.</div>
+
+  <script>
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').then(function(registration) {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+
+    // Offline detection
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    function updateOnlineStatus() {
+      const notification = document.getElementById('offline-notification');
+      if (navigator.onLine) {
+        notification.style.display = 'none';
+      } else {
+        notification.style.display = 'block';
+      }
+    }
+
+    // Initialize online status on page load
+    updateOnlineStatus();
+
+    document.getElementById('createStringButton').addEventListener('click', createString);
+    document.getElementById('createRemarkButton').addEventListener('click', createRemark);
+    document.getElementById('saveButton').addEventListener('click', saveOutput);
+    document.getElementById('clearButton').addEventListener('click', clearOutput);
+    
+    // Add the clear button function
+    function clearOutput() {
+      document.getElementById('output').value = '';
+      // Reset any active modifiers
+      activeModifiers = [];
+      updateModifierHighlights();
+      
+      // Vibrate for feedback on mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(100);
+      }
+    }
+    
+    // Global variables to track modifier state
+    let activeModifiers = [];
+
+    // Show/hide scroll to top button
+    window.onscroll = function() {
+      const scrollBtn = document.getElementById('scrollTopBtn');
+      if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        scrollBtn.style.display = 'flex';
+      } else {
+        scrollBtn.style.display = 'none';
+      }
+    };
+
+    // Initially hide the scroll button
+    document.getElementById('scrollTopBtn').style.display = 'none';
+
+    function scrollToTop() {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function createString() {
+      const input = document.getElementById('input');
+      const output = document.getElementById('output');
+      let translatedInput = '';
+
+      const lines = input.value.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        if (line === '') {
+          continue; // Skip empty lines
+        }
+
+        translatedInput += `STRING ${line}\n`;
+      }
+
+      output.value += translatedInput.trim() + '\n'; // Append to the output and add a new line
+      input.value = ''; // Clear the input
+      
+      // Vibrate for feedback on mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }
+
+    function createRemark() {
+      const input = document.getElementById('input');
+      const output = document.getElementById('output');
+      let translatedInput = '';
+
+      const lines = input.value.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        if (line === '') {
+          continue; // Skip empty lines
+        }
+
+        translatedInput += `REM ${line}\n`;
+      }
+
+      output.value += translatedInput.trim() + '\n'; // Append to the output and add a new line
+      input.value = ''; // Clear the input
+      
+      // Vibrate for feedback on mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }
+
+    function appendToOutput(value) {
+      const output = document.getElementById('output');
+      
+      // Handle modifier combos correctly
+      if (value.includes('-')) {
+        output.value += value + '\n';
+        activeModifiers = []; // Reset active modifiers after using a combo
+        updateModifierHighlights();
+        return;
+      }
+      
+      // Apply active modifiers if any
+      if (activeModifiers.length > 0 && !['CTRL', 'CONTROL', 'SHIFT', 'ALT', 'GUI', 'ALTGR', 'WINDOWS', 'COMMAND'].includes(value)) {
+        let command = activeModifiers.join('-');
+        if (activeModifiers.length === 1) {
+          command += ' ';
+        }
+        command += value;
+        output.value += command + '\n';
+        activeModifiers = []; // Reset modifiers after use
+        updateModifierHighlights();
+      } else if (['CTRL', 'CONTROL', 'SHIFT', 'ALT', 'GUI', 'ALTGR', 'WINDOWS', 'COMMAND'].includes(value)) {
+        // Don't add to output yet, just save as active modifier
+        addModifier(value);
+      } else {
+        output.value += value + '\n';
+      }
+      
+      // Vibrate for feedback on mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }
+    
+    function updateModifierHighlights() {
+      // Clear all highlights
+      document.getElementById('ctrlBtn').classList.remove('modifier-highlight');
+      document.getElementById('shiftBtn').classList.remove('modifier-highlight');
+      document.getElementById('altBtn').classList.remove('modifier-highlight');
+      document.getElementById('guiBtn').classList.remove('modifier-highlight');
+      document.getElementById('altgrBtn').classList.remove('modifier-highlight');
+      document.getElementById('windowsBtn').classList.remove('modifier-highlight');
+      document.getElementById('commandBtn').classList.remove('modifier-highlight');
+      
+      // Add highlights to active modifiers
+      for (const mod of activeModifiers) {
+        if (mod === 'CTRL') document.getElementById('ctrlBtn').classList.add('modifier-highlight');
+        if (mod === 'SHIFT') document.getElementById('shiftBtn').classList.add('modifier-highlight');
+        if (mod === 'ALT') document.getElementById('altBtn').classList.add('modifier-highlight');
+        if (mod === 'GUI') document.getElementById('guiBtn').classList.add('modifier-highlight');
+        if (mod === 'ALTGR') document.getElementById('altgrBtn').classList.add('modifier-highlight');
+        if (mod === 'WINDOWS') document.getElementById('windowsBtn').classList.add('modifier-highlight');
+        if (mod === 'COMMAND') document.getElementById('commandBtn').classList.add('modifier-highlight');
+      }
+    }
+    
+    function addModifier(modifier) {
+      // If CONTROL is passed, standardize to CTRL
+      if (modifier === 'CONTROL') modifier = 'CTRL';
+      
+      // Toggle modifier state - if already active, remove it
+      const index = activeModifiers.indexOf(modifier);
+      if (index !== -1) {
+        activeModifiers.splice(index, 1);
+      } else {
+        // Add to active modifiers if not already present
+        activeModifiers.push(modifier);
+      }
+      
+      // Update visual indicators
+      updateModifierHighlights();
+      
+      // Vibrate for feedback on mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }
+
+    function insertChar() {
+      const charInput = document.getElementById('charInput');
+      const char = charInput.value.trim();
+
+      if (char !== '') {
+        if (activeModifiers.length > 0) {
+          // Join modifiers with char
+          let command = activeModifiers.join('-');
+          if (activeModifiers.length === 1) {
+            command += ' ';
+          }
+          command += char;
+          
+          const output = document.getElementById('output');
+          output.value += command + '\n';
+          activeModifiers = []; // Reset modifiers after use
+          updateModifierHighlights();
+        } else {
+          appendToOutput(char);
+        }
+        
+        charInput.value = '';
+      }
+      
+      // Vibrate for feedback on mobile
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }
+
+    // Enable keyup support for the character input field
+    document.getElementById('charInput').addEventListener('keyup', function(event) {
+      if (event.key === 'Enter') {
+        insertChar();
+      }
+    });
+
+    function saveOutput() {
+      const output = document.getElementById('output');
+      const filename = prompt("Enter the filename", "badusb.txt");
+      if (!filename) return; // User cancelled
+      
+      const blob = new Blob([output.value], { type: 'text/plain' });
+      const anchor = document.createElement('a');
+      anchor.download = filename;
+      anchor.href = window.URL.createObjectURL(blob);
+      anchor.click();
+      window.URL.revokeObjectURL(anchor.href); // Clean up
+      
+      // Vibrate for feedback on mobile
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 50]);
+      }
+    }
+    
+    // Initialize modifier highlights
+    updateModifierHighlights();
+    
+    // Prevent zooming on double-tap for iOS devices
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+  </script>
+</body>
+</html>
