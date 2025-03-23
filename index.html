@@ -466,12 +466,19 @@
       // Create a hidden file input element
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
-      fileInput.accept = '.txt';
+      fileInput.accept = '.txt'; // Restrict to .txt files
       
       // Handle file selection
       fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
+        
+        // Validate file extension
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        if (fileExtension !== 'txt') {
+          alert('Please select a text (.txt) file only.');
+          return;
+        }
         
         const reader = new FileReader();
         reader.onload = function(e) {
